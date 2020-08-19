@@ -40,7 +40,7 @@ public class Board : MonoBehaviour
                 {
                     if (hit.transform == _nodes[i].transform)
                     {
-                        _nodes[i].Click();
+                        _nodes[i].ToggleActive();
                     }
                 }
             }
