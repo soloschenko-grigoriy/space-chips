@@ -3,7 +3,10 @@
 public class Board : MonoBehaviour
 {
     [SerializeField]
-    public Node[] Nodes;
+    private Node[] _nodes;
+
+    [SerializeField]
+    private Ship[] _ships;
 
     void Update()
     {
@@ -14,11 +17,12 @@ public class Board : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit))
             {
-                for (int i = 0; i < Nodes.Length; i++)
+                for (int i = 0; i < _nodes.Length; i++)
                 {
-                    if (hit.transform == Nodes[i].transform)
+                    if (hit.transform == _nodes[i].transform)
                     {
-                        Nodes[i].ToggleActive();
+                        // _nodes[i].ToggleActive();
+                        _ships[0].MoveTo(_nodes[i].transform.localPosition);
                     }
                 }
             }
