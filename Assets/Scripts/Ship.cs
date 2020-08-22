@@ -4,38 +4,8 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class Ship : MonoBehaviour
 {
-    // [SerializeField, Range(1f, 100f)]
-    // float _speed = 5f;
-    // Vector3 _targetPosition;
-    // float _timeElapsed = 0;
-
-    // void Awake()
-    // {
-    //     _targetPosition = transform.localPosition;
-    // }
-
-    // void Update()
-    // {
-    //     if (Vector3.Distance(transform.localPosition, _targetPosition) > 0.001)
-    //     {
-    //         transform.localPosition = Vector3.Lerp(transform.localPosition, _targetPosition, _timeElapsed);
-    //         _timeElapsed += Time.deltaTime * _speed / 1000;
-
-    //         Vector3 relativePos = _targetPosition - transform.position;
-    //         transform.rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-    //     }
-    //     else
-    //     {
-    //         _targetPosition = transform.localPosition;
-    //     }
-    // }
-
-    // public void MoveTo(Vector3 position)
-    // {
-    //     _timeElapsed = 0;
-    //     _targetPosition = position;
-    // }
-
+    [SerializeField]
+    float _moveRange = 5f;
     NavMeshAgent _agent = default;
 
     void Awake()
@@ -47,13 +17,39 @@ public class Ship : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            OnClick();
+        }
+    }
 
-            if (Physics.Raycast(ray, out hit))
+    private void OnClick()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            float distance = Vector3.Distance(hit.point, transform.position);
+            if (distance <= _moveRange)
             {
-                _agent.SetDestination(hit.point);
+                MoveTo(hit.point);
             }
         }
+    }
+
+    private void MoveTo(Vector3 point)
+    {
+        _agent.SetDestination(point);
+        transform.LookAt(point);
+    }
+
+    private void OnDrawGizmos()
+    {
+        UnityEditor.Handles.color = Color.yellow;
+        UnityEditor.Handles.DrawWireDisc(
+            new Vector3(transform.position.x, 0, transform.position.z),
+            Vector3.down,
+            _moveRange
+        );
+        // Gizmos.DrawWireSphere(transform.position, _moveRange);
     }
 }
