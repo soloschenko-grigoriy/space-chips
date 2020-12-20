@@ -7,6 +7,7 @@ public class HexCell : MonoBehaviour {
 
     [SerializeField] Color inActiveColor = Color.white;
     [SerializeField] Color activeColor = Color.green;
+    [SerializeField] Color rangeColor = Color.red;
 
     public bool IsActive {
         get {
@@ -19,7 +20,18 @@ public class HexCell : MonoBehaviour {
         }
     }
 
-    bool isActive;
+    public bool IsInRange {
+        get {
+            return isInRange;
+        }
+
+        set {
+            isInRange = value;
+            rend.material.color = value ? rangeColor : inActiveColor;
+        }
+    }
+
+    bool isActive, isInRange;
     Renderer rend;
 
     void Awake() {
