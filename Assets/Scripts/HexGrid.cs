@@ -15,6 +15,8 @@ public class HexGrid : MonoBehaviour {
     HexCell[] cells;
     Canvas canvas;
 
+    RaycastHit[] raycastHits = new RaycastHit[100];
+
     void Awake() {
         canvas = GetComponentInChildren<Canvas>();
         cells = new HexCell[cols * rows];
@@ -23,6 +25,12 @@ public class HexGrid : MonoBehaviour {
             for (int x = 0; x < rows; x++) {
                 cells[i] = CreateCell(x, z);
             }
+        }
+    }
+
+    void Update() {
+        if (Input.GetMouseButtonDown(0)) {
+            HandleInput();
         }
     }
 
@@ -38,8 +46,22 @@ public class HexGrid : MonoBehaviour {
         var label = Instantiate<Text>(cellLabelPrefab);
         label.rectTransform.SetParent(canvas.transform, false);
         label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
-        label.text = $"({cell.Q}, {cell.S}, {cell.R})";
+        label.text = cell.GetCoordinates();
 
         return cell;
+    }
+
+
+    private void HandleInput() {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        int hits = Physics.RaycastNonAlloc(ray, raycastHits);
+
+        for (int i = 0; i < hits; i++) {
+            var cell = raycastHits[i].collider.GetComponentInParent<HexCell>();
+            if (cell) {
+                cell.ToggleIsActive();
+                Debug.Log(cell.GetCoordinates());
+            }
+        }
     }
 }
