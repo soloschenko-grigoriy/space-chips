@@ -10,6 +10,7 @@ public class Board : MonoBehaviour
 
     void Update()
     {
+        
         // if (Input.GetMouseButtonDown(0))
         // {
         //     RaycastHit hit;
