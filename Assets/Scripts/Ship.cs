@@ -20,7 +20,7 @@ public class Ship : MonoBehaviour
 
     private float _shield = 25f;
 
-    private float _maxShield = 100f;
+    // private float _maxShield = 100f;
 
     private float _energy = 25f;
 
@@ -53,7 +53,7 @@ public class Ship : MonoBehaviour
         }
     }
 
-    private float _maxEnergy = 100f;
+    // private float _maxEnergy = 100f;
 
     private void Awake()
     {

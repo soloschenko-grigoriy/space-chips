@@ -6,14 +6,14 @@ public class ShipUI : MonoBehaviour
     [SerializeField]
     private Text _energyText = default;
 
-    [SerializeField]
-    private RectTransform _energyFill = default;
+    // [SerializeField]
+    // private RectTransform _energyFill = default;
 
     [SerializeField]
     private Text _shieldText = default;
 
     [SerializeField]
-    private RectTransform _shieldFill = default;
+    // private RectTransform _shieldFill = default;
 
     private void Awake()
     {
