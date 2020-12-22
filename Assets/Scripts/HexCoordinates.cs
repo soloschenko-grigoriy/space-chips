@@ -1,8 +1,7 @@
 using UnityEngine;
-using System;
 
 [System.Serializable]
-public class HexCoordinates : IEquatable<HexCoordinates> {
+public struct HexCoordinates {
     [SerializeField]
     private int x, z;
 
@@ -23,17 +22,10 @@ public class HexCoordinates : IEquatable<HexCoordinates> {
         return $"({X.ToString()}, {Y.ToString()}, {Z.ToString()})";
     }
 
-    public override bool Equals(object obj) {
-        return base.Equals(obj as HexCoordinates);
-    }
+    public override bool Equals(object obj) =>
+        obj is HexCoordinates coord && X == coord.X && Y == coord.Y && Z == coord.Z;
 
-    public bool Equals(HexCoordinates obj) {
-        if (obj.X != x || obj.Y != Y || obj.Z != Z) {
-            return false;
-        }
-
-        return true;
-    }
+    public override int GetHashCode() => X ^ Y ^ Z;
 
     public static bool operator ==(HexCoordinates lhs, HexCoordinates rhs) {
         return lhs.Equals(rhs);
@@ -41,9 +33,5 @@ public class HexCoordinates : IEquatable<HexCoordinates> {
 
     public static bool operator !=(HexCoordinates lhs, HexCoordinates rhs) {
         return !lhs.Equals(rhs);
-    }
-
-    public override int GetHashCode() {
-        return X * Y * Z;
     }
 }

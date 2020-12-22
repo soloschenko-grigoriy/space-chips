@@ -468,8 +468,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf0760827b07d4a9388a47a50c7bdfcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 6
-  cols: 6
+  rows: 12
+  cols: 12
   hexCellPrefab: {fileID: 4697639445127745332, guid: 623a4b13c9e3844ebaa39439b5412eb5, type: 3}
   cellLabelPrefab: {fileID: 1088738881307886183, guid: 08d7939e7e77a4f94b969f4b61f61661, type: 3}
 --- !u!4 &1717488897
@@ -1446,15 +1446,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2876000782924916590, guid: 605058fd08f6343668b94f3ff2498abe, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.24
+      value: 10.34
       objectReference: {fileID: 0}
     - target: {fileID: 2876000782924916590, guid: 605058fd08f6343668b94f3ff2498abe, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.13
+      value: 8.8
       objectReference: {fileID: 0}
     - target: {fileID: 2876000782924916590, guid: 605058fd08f6343668b94f3ff2498abe, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.74
+      value: -10.13
       objectReference: {fileID: 0}
     - target: {fileID: 2876000782924916590, guid: 605058fd08f6343668b94f3ff2498abe, type: 3}
       propertyPath: m_LocalRotation.x
