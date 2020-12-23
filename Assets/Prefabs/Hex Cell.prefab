@@ -41,15 +41,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2382187230643607790}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c0315ac3372ef4965a8bfce941ca1bb9, type: 3}
+  m_Script: {fileID: 11500000, guid: b43e2f1433e0e4fd59b145c10ac4bf32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   coordinates:
     x: 0
     z: 0
-  inActiveColor: {r: 1, g: 1, b: 1, a: 1}
-  activeColor: {r: 0.6179246, g: 1, b: 0.6179246, a: 1}
-  rangeColor: {r: 1, g: 0.4198113, b: 0.4198113, a: 1}
+  Neighbors: []
+  inactiveColor: {r: 1, g: 1, b: 1, a: 1}
+  activeColor: {r: 0, g: 1, b: 0, a: 1}
+  rangeColor: {r: 1, g: 0, b: 0, a: 1}
+  pathColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!1 &8394056523169401676
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,17 +10,17 @@ public class HexGrid : MonoBehaviour {
     [SerializeField] HexCell hexCellPrefab = default;
     [SerializeField] Text cellLabelPrefab = default;
 
-    HexCell[] cells;
+    public HexCell[] Cells { get; private set; }
+
     Canvas canvas;
-    RaycastHit[] raycastHits = new RaycastHit[100];
 
     void Awake() {
         canvas = GetComponentInChildren<Canvas>();
-        cells = new HexCell[(cols + 1) * (rows + 1)];
+        Cells = new HexCell[(cols + 1) * (rows + 1)];
 
         for (int i = 0, col = -cols / 2; col < cols / 2 + 1; col++) {
             for (int row = -rows / 2; row < rows / 2 + 1; row++, i++) {
-                cells[i] = CreateCell(col, row);
+                Cells[i] = CreateCell(col, row);
             }
         }
 
@@ -29,15 +29,9 @@ public class HexGrid : MonoBehaviour {
         StaticBatchingUtility.Combine(this.gameObject);
     }
 
-    void Update() {
-        if (Input.GetMouseButtonDown(0)) {
-            HandleInput();
-        }
-    }
-
     void SetNeighbors() {
-        for (int i = 0; i < cells.Length; i++) {
-            var cell = cells[i];
+        for (int i = 0; i < Cells.Length; i++) {
+            var cell = Cells[i];
             cell.Neighbors = new HexCell[6];
             // NE
             cell.Neighbors[0] = FindNeighborByCoordinates(cell.coordinates.X, cell.coordinates.Y - 1, cell.coordinates.Z + 1);
@@ -54,21 +48,21 @@ public class HexGrid : MonoBehaviour {
         }
     }
 
-    HexCell FindNeighborByCoordinates(int x, int y, int z) {
-        for (int i = 0; i < cells.Length; i++) {
-            if (cells[i].coordinates.X != x) {
+    public HexCell FindNeighborByCoordinates(int x, int y, int z) {
+        for (int i = 0; i < Cells.Length; i++) {
+            if (Cells[i].coordinates.X != x) {
                 continue;
             }
 
-            if (cells[i].coordinates.Y != y) {
+            if (Cells[i].coordinates.Y != y) {
                 continue;
             }
 
-            if (cells[i].coordinates.Z != z) {
+            if (Cells[i].coordinates.Z != z) {
                 continue;
             }
 
-            return cells[i];
+            return Cells[i];
         }
 
         return null;
@@ -93,24 +87,9 @@ public class HexGrid : MonoBehaviour {
         return cell;
     }
 
-    void HandleInput() {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        int hits = Physics.RaycastNonAlloc(ray, raycastHits);
-
-        for (int i = 0; i < hits; i++) {
-            var cell = raycastHits[i].collider.GetComponentInParent<HexCell>();
-            if (cell) {
-                // HighlightPath(cells[cells.Length - 1], cell);
-                HighlightInRange(cell, 3);
-                cell.ToggleIsActive();
-                break;
-            }
-        }
-    }
-
     List<HexCell> CellsInRange(HexCoordinates center, int range) {
         var result = new List<HexCell>();
-        foreach (HexCell cell in cells) {
+        foreach (HexCell cell in Cells) {
             if (cell.coordinates == center) {
                 continue;
             }
@@ -133,13 +112,13 @@ public class HexGrid : MonoBehaviour {
         return result;
     }
 
-    void HighlightInRange(HexCell center, int range) {
+    public void HighlightInRange(HexCell center, int range) {
         foreach (var c in CellsInRange(center.coordinates, range)) {
             c.IsInRange = true;
         }
     }
 
-    void HighlightPath(HexCell from, HexCell to) {
+    public void HighlightPath(HexCell from, HexCell to) {
         var path = new AStarSearch(to, from);
         from.IsInPath = true;
         foreach (var item in path.cameFrom) {
