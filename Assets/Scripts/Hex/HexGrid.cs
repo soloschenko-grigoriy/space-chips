@@ -112,18 +112,25 @@ public class HexGrid : MonoBehaviour {
         return result;
     }
 
-    public void HighlightInRange(HexCell center, int range) {
+    public void SetTypeInRange(HexCell center, int range, HexCellHighlightType type) {
         foreach (var c in CellsInRange(center.coordinates, range)) {
-            c.IsInRange = true;
+            c.Type = type;
         }
     }
 
-    public void HighlightPath(HexCell from, HexCell to) {
+    public void ResetTypeForAll() {
+        foreach (var cell in Cells) {
+            cell.Type = HexCellHighlightType.Default;
+        }
+    }
+
+    public void HighlightPath(HexCell from, HexCell to, HexCellHighlightType type) {
         var path = new AStarSearch(to, from);
-        from.IsInPath = true;
+        from.Type = HexCellHighlightType.Default;
+
         foreach (var item in path.cameFrom) {
             if (item.Value) {
-                item.Value.IsInPath = true;
+                item.Value.Type = type;
             }
         }
     }

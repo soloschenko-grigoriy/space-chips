@@ -2,20 +2,20 @@
 
 [RequireComponent(typeof(HexAgent))]
 public class Ship : MonoBehaviour {
+    public bool IsActive, IsMoving = false;
+    public HexAgent HexAgent { get; private set; }
+
     [SerializeField] Color inactiveColor = Color.white;
     [SerializeField] Color activeColor = Color.green;
     [SerializeField] Color movingColor = Color.red;
 
     StateMachina _stateMachina;
-    HexAgent _hexAgent;
     RaycastHit[] _raycastHits = new RaycastHit[100];
     Renderer _renderer;
 
-    public bool IsActive, IsMoving = false;
-
     void Awake() {
         _renderer = GetComponentInChildren<Renderer>();
-        _hexAgent = GetComponent<HexAgent>();
+        HexAgent = GetComponent<HexAgent>();
 
         var idleState = new ShipStateIdle(this);
         var activeState = new ShipStateActive(this);
@@ -58,7 +58,7 @@ public class Ship : MonoBehaviour {
         for (int i = 0; i < hits; i++) {
             var cell = _raycastHits[i].collider.GetComponentInParent<HexCell>();
             if (cell) {
-                _hexAgent.SetDestination(cell);
+                HexAgent.SetDestination(cell);
                 break;
             }
         }

@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class HexAgent : MonoBehaviour {
-    [SerializeField] HexGrid hexGrid = default;
+    [SerializeField] HexGrid _hexGrid = default;
     [SerializeField] float _moveDuration = 0.3f;
+    [SerializeField] int _moveRange = 2;
+
     float _timeStarted;
     Vector3 _startPosition;
     List<HexCell> _path = new List<HexCell>();
@@ -12,7 +14,7 @@ public class HexAgent : MonoBehaviour {
     int _currentIndex;
 
     void Start() {
-        _currentCell = hexGrid.Cells[0];
+        _currentCell = _hexGrid.Cells[0];
         transform.position = _currentCell.transform.position;
     }
 
@@ -30,19 +32,24 @@ public class HexAgent : MonoBehaviour {
         foreach (var item in path.cameFrom.Values) {
             if (item && !_path.Contains(item)) {
                 _path.Add(item);
-                item.IsInPath = true;
+                item.Type = HexCellHighlightType.Path;
             }
         }
 
         _path.Add(cell);
-        cell.IsInPath = true;
-        // HighlightInRange(cell, 3);
-        // cell.ToggleIsActive();
+        cell.Type = HexCellHighlightType.Path;
         _currentCell = cell;
         _currentIndex = 0;
 
         ContinueToNextCell();
-        // hexGrid.HighlightPath(currentCell, cell);
+    }
+
+    public void HighlightMovementRange() {
+        _hexGrid.SetTypeInRange(_currentCell, _moveRange, HexCellHighlightType.Range);
+    }
+
+    public void HideMovementRange() {
+        _hexGrid.SetTypeInRange(_currentCell, _moveRange, HexCellHighlightType.Default);
     }
 
     void ContinueToNextCell() {
@@ -77,9 +84,6 @@ public class HexAgent : MonoBehaviour {
     void CleanupPath() {
         _nextCell = null;
         _path = new List<HexCell>();
-
-        foreach (var cell in hexGrid.Cells) {
-            cell.IsInPath = false;
-        }
+        _hexGrid.ResetTypeForAll();
     }
 }
