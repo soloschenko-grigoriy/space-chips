@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 public enum HexCellHighlightType {
-    Target, Range, Path, Default
+    Target, Range, Path, Occupied, Default
 }
 
 public class HexCell : MonoBehaviour {
@@ -12,15 +12,16 @@ public class HexCell : MonoBehaviour {
     public HexCell[] Neighbors;
     public HexCellHighlightType Type = HexCellHighlightType.Default;
 
-    [SerializeField] Color defaultColor = Color.white;
-    [SerializeField] Color activeColor = Color.green;
-    [SerializeField] Color rangeColor = Color.red;
-    [SerializeField] Color pathColor = Color.grey;
+    [SerializeField] Color _defaultColor = Color.white;
+    [SerializeField] Color _activeColor = Color.green;
+    [SerializeField] Color _rangeColor = Color.red;
+    [SerializeField] Color _pathColor = Color.grey;
+    [SerializeField] Color _occupiedColor = Color.clear;
 
-    Renderer rend;
+    Renderer _renderer;
 
     void Awake() {
-        rend = GetComponentInChildren<Renderer>();
+        _renderer = GetComponentInChildren<Renderer>();
     }
 
     void Update() {
@@ -32,15 +33,16 @@ public class HexCell : MonoBehaviour {
     }
 
     void SetColor() {
-        var color = rend.material.color = defaultColor;
+        var color = _renderer.material.color = _defaultColor;
         switch (Type) {
-            case HexCellHighlightType.Path: color = pathColor; break;
-            case HexCellHighlightType.Range: color = rangeColor; break;
-            case HexCellHighlightType.Target: color = activeColor; break;
+            case HexCellHighlightType.Path: color = _pathColor; break;
+            case HexCellHighlightType.Range: color = _rangeColor; break;
+            case HexCellHighlightType.Target: color = _activeColor; break;
+            case HexCellHighlightType.Occupied: color = _occupiedColor; break;
         }
 
-        if (color != rend.material.color) {
-            rend.material.color = color;
+        if (color != _renderer.material.color) {
+            _renderer.material.color = color;
         }
     }
 }

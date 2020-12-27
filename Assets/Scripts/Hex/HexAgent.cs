@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class HexAgent : MonoBehaviour {
     public delegate void OnComplete(HexCell cell);
+
     [SerializeField] float _moveDuration = 0.3f;
     [SerializeField] int _moveRange = 2;
 
@@ -16,7 +17,7 @@ public class HexAgent : MonoBehaviour {
     int _currentIndex;
     OnComplete _onComplete;
 
-    void Awake (){
+    void Awake() {
         _hexGrid = FindObjectOfType<HexGrid>();
     }
 
@@ -30,6 +31,7 @@ public class HexAgent : MonoBehaviour {
 
     public void Spawn(HexCell cell) {
         _currentCell = cell;
+        cell.Type = HexCellHighlightType.Occupied;
         transform.position = _currentCell.transform.position;
     }
 
@@ -70,7 +72,10 @@ public class HexAgent : MonoBehaviour {
     void ProcessMovementStep() {
         var progress = (Time.time - _timeStarted) / this._moveDuration;
         if (progress >= 1) {
+            _currentCell.Type = HexCellHighlightType.Default;
             _currentCell = _nextCell;
+            _currentCell.Type = HexCellHighlightType.Occupied;
+
             transform.position = _currentCell.transform.position;
 
             if (_currentIndex < _path.Count) {
@@ -80,6 +85,7 @@ public class HexAgent : MonoBehaviour {
                 CleanupPath();
                 _onComplete(_currentCell);
             }
+
 
         }
         else {
@@ -94,6 +100,5 @@ public class HexAgent : MonoBehaviour {
     void CleanupPath() {
         _nextCell = null;
         _path = new List<HexCell>();
-        _hexGrid.ResetTypeForAll();
     }
 }

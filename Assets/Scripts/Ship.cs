@@ -6,9 +6,9 @@ public class Ship : MonoBehaviour {
     public HexAgent HexAgent { get; private set; }
     public Fleet Fleet { get; private set; }
 
-    [SerializeField] Color inactiveColor = Color.white;
-    [SerializeField] Color activeColor = Color.green;
-    [SerializeField] Color movingColor = Color.red;
+    [SerializeField] Color _inactiveColor = Color.white;
+    [SerializeField] Color _activeColor = Color.green;
+    [SerializeField] Color _movingColor = Color.red;
 
     StateMachina _stateMachina;
     Renderer _renderer;
@@ -36,13 +36,13 @@ public class Ship : MonoBehaviour {
         _stateMachina.Update();
 
         if (IsActive) {
-            _renderer.material.color = activeColor;
+            _renderer.material.color = _activeColor;
         }
         else if (IsMoving) {
-            _renderer.material.color = movingColor;
+            _renderer.material.color = _movingColor;
         }
         else {
-            _renderer.material.color = inactiveColor;
+            _renderer.material.color = _inactiveColor;
         }
     }
 

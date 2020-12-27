@@ -33,7 +33,7 @@ public class HexGrid : MonoBehaviour {
         IsReady = true;
         onReady();
     }
-    
+
     public HexCell FindBy(int x, int y, int z) {
         for (int i = 0; i < Cells.Length; i++) {
             if (Cells[i].coordinates.X != x) {
@@ -127,6 +127,10 @@ public class HexGrid : MonoBehaviour {
         var result = new List<HexCell>();
         foreach (HexCell cell in Cells) {
             if (cell.coordinates == center) {
+                continue;
+            }
+
+            if (cell.Type == HexCellHighlightType.Occupied) {
                 continue;
             }
 
