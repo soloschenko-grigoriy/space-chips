@@ -18,6 +18,10 @@ public struct HexCoordinates {
         return new HexCoordinates(x - z / 2, z);
     }
 
+    public static HexCoordinates FromVector2(Vector2Int coordinates) {
+        return new HexCoordinates(coordinates.x, coordinates.y);
+    }
+
     public override string ToString() {
         return $"({X.ToString()}, {Y.ToString()}, {Z.ToString()})";
     }

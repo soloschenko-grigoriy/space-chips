@@ -31,7 +31,6 @@ public class Ship : MonoBehaviour {
         _stateMachina = new StateMachina(new IState[] { idleState, activeState, movingState }, idleState);
     }
 
-
     void Update() {
         _stateMachina.Update();
 

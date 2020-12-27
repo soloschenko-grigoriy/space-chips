@@ -4,21 +4,20 @@ using UnityEngine;
 
 public class HexAgent : MonoBehaviour {
     public delegate void OnComplete(HexCell cell);
-    [SerializeField] HexGrid _hexGrid = default;
     [SerializeField] float _moveDuration = 0.3f;
     [SerializeField] int _moveRange = 2;
 
+    HexGrid _hexGrid;
     float _timeStarted;
     Vector3 _startPosition;
     List<HexCell> _path = new List<HexCell>();
     HexCell _currentCell;
     HexCell _nextCell;
-    int _currentIndex;  
+    int _currentIndex;
     OnComplete _onComplete;
 
-    void Start() {
-        _currentCell = _hexGrid.Cells[0];
-        transform.position = _currentCell.transform.position;
+    void Awake (){
+        _hexGrid = FindObjectOfType<HexGrid>();
     }
 
     void Update() {
@@ -27,6 +26,11 @@ public class HexAgent : MonoBehaviour {
         }
 
         ProcessMovementStep();
+    }
+
+    public void Spawn(HexCell cell) {
+        _currentCell = cell;
+        transform.position = _currentCell.transform.position;
     }
 
     public void SetDestination(HexCell cell) {
