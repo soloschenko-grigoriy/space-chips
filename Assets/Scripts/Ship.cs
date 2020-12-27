@@ -10,7 +10,6 @@ public class Ship : MonoBehaviour {
     [SerializeField] Color movingColor = Color.red;
 
     StateMachina _stateMachina;
-    RaycastHit[] _raycastHits = new RaycastHit[100];
     Renderer _renderer;
 
     void Awake() {
@@ -36,10 +35,6 @@ public class Ship : MonoBehaviour {
     void Update() {
         _stateMachina.Update();
 
-        if (Input.GetMouseButtonDown(0)) {
-            HandleInput();
-        }
-
         if (IsActive) {
             _renderer.material.color = activeColor;
         }
@@ -48,19 +43,6 @@ public class Ship : MonoBehaviour {
         }
         else {
             _renderer.material.color = inactiveColor;
-        }
-    }
-
-    void HandleInput() {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        int hits = Physics.RaycastNonAlloc(ray, _raycastHits);
-
-        for (int i = 0; i < hits; i++) {
-            var cell = _raycastHits[i].collider.GetComponentInParent<HexCell>();
-            if (cell) {
-                HexAgent.SetDestination(cell);
-                break;
-            }
         }
     }
 }

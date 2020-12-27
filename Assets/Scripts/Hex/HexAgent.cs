@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class HexAgent : MonoBehaviour {
+    public delegate void OnComplete(HexCell cell);
     [SerializeField] HexGrid _hexGrid = default;
     [SerializeField] float _moveDuration = 0.3f;
     [SerializeField] int _moveRange = 2;
@@ -11,7 +13,8 @@ public class HexAgent : MonoBehaviour {
     List<HexCell> _path = new List<HexCell>();
     HexCell _currentCell;
     HexCell _nextCell;
-    int _currentIndex;
+    int _currentIndex;  
+    OnComplete _onComplete;
 
     void Start() {
         _currentCell = _hexGrid.Cells[0];
@@ -38,9 +41,11 @@ public class HexAgent : MonoBehaviour {
 
         _path.Add(cell);
         cell.Type = HexCellHighlightType.Path;
-        _currentCell = cell;
-        _currentIndex = 0;
+    }
 
+    public void StartMoving(OnComplete onComplete) {
+        _currentIndex = 0;
+        _onComplete = onComplete;
         ContinueToNextCell();
     }
 
@@ -69,6 +74,7 @@ public class HexAgent : MonoBehaviour {
             }
             else {
                 CleanupPath();
+                _onComplete(_currentCell);
             }
 
         }

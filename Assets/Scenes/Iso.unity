@@ -1232,11 +1232,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c6e536c2127a4e31944a201e0d8d3d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  IsActive: 0
+  IsMoving: 0
   inactiveColor: {r: 1, g: 1, b: 1, a: 1}
   activeColor: {r: 0, g: 1, b: 0, a: 1}
   movingColor: {r: 1, g: 0, b: 0, a: 1}
-  IsActive: 0
-  IsMoving: 0
 --- !u!114 &1965393225
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1249,8 +1249,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 65485e99939064bb4a69c19884cb0f89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hexGrid: {fileID: 1717488896}
+  _hexGrid: {fileID: 1717488896}
   _moveDuration: 0.3
+  _moveRange: 2
 --- !u!1 &2081757388
 GameObject:
   m_ObjectHideFlags: 0
