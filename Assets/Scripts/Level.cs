@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Level : MonoBehaviour {
     [SerializeField] HexGrid _hexGridPrefab = default;
-    [SerializeField] Fleet _fleetPrefab = default;
+    [SerializeField] Fleet[] _fleetPrefabs = default;
 
     HexGrid _hexGrid;
-    Fleet _playerFleet;
+    Fleet[] _fleets;
 
     void Awake() {
         // Instantiate Fleets only after grid is ready
@@ -16,8 +16,12 @@ public class Level : MonoBehaviour {
     }
 
     void SpawnFleet() {
-        _playerFleet = Instantiate(_fleetPrefab);
-        _playerFleet.SpawnOnGrid(_hexGrid);
+        _fleets = new Fleet[_fleetPrefabs.Length];
+
+        for (int i = 0; i < _fleetPrefabs.Length; i++) {
+            _fleets[i] = Instantiate(_fleetPrefabs[i]);
+            _fleets[i].SpawnOnGrid(_hexGrid);
+        }
     }
 
 }

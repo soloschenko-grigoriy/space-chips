@@ -1,8 +1,15 @@
 ﻿using UnityEngine;
 
+public enum FleetOwner {
+    Player, AI
+}
+
 public class Fleet : MonoBehaviour {
+    public FleetOwner Type { get => _type; }
+
     [SerializeField] Ship _shipPrefab = default;
     [SerializeField] Vector2Int[] _positions = default;
+    [SerializeField] FleetOwner _type = default;
 
     Ship[] _ships;
     int _currentActive;

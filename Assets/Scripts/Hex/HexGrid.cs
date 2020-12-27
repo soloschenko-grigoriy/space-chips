@@ -63,8 +63,9 @@ public class HexGrid : MonoBehaviour {
     }
 
     public void SetTypeInRange(HexCell center, int range, HexCellHighlightType type) {
-        foreach (var c in CellsInRange(center.coordinates, range)) {
-            c.Type = type;
+        var cells = FindAllInRange(center.coordinates, range);
+        for (int i = 0; i < cells.Count; i++) {
+            cells[i].Type = type;
         }
     }
 
@@ -123,7 +124,7 @@ public class HexGrid : MonoBehaviour {
         return cell;
     }
 
-    List<HexCell> CellsInRange(HexCoordinates center, int range) {
+    List<HexCell> FindAllInRange(HexCoordinates center, int range) {
         var result = new List<HexCell>();
         foreach (HexCell cell in Cells) {
             if (cell.coordinates == center) {

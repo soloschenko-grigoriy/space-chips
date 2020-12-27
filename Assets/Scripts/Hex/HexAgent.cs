@@ -63,6 +63,13 @@ public class HexAgent : MonoBehaviour {
         _hexGrid.SetTypeInRange(_currentCell, _moveRange, HexCellHighlightType.Default);
     }
 
+    public HexCell GetRandomCellInRange() {
+        var cells = Array.FindAll(_hexGrid.Cells, (c) => c.Type == HexCellHighlightType.Range);
+        var index = UnityEngine.Random.Range(0, cells.Length - 1);
+
+        return cells[index];
+    }
+    
     void ContinueToNextCell() {
         _nextCell = _path[_currentIndex++];
         _timeStarted = Time.time;
