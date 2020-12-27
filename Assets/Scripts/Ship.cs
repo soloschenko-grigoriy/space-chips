@@ -1,74 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+[RequireComponent(typeof(HexAgent))]
 public class Ship : MonoBehaviour {
-    [SerializeField] HexGrid hexGrid = default;
-    [SerializeField] float _moveDuration = 0.3f;
+    [SerializeField] Color inactiveColor = Color.white;
+    [SerializeField] Color activeColor = Color.green;
+    [SerializeField] Color movingColor = Color.red;
 
+    StateMachina _stateMachina;
+    HexAgent _hexAgent;
     RaycastHit[] _raycastHits = new RaycastHit[100];
-    float _timeStarted;
-    Vector3 _startPosition;
-    List<HexCell> _path = new List<HexCell>();
-    HexCell _currentCell;
-    HexCell _nextCell;
-    int _currentIndex;
+    Renderer _renderer;
 
-    void Start() {
-        _currentCell = hexGrid.Cells[0];
-        transform.position = _currentCell.transform.position;
+    public bool IsActive, IsMoving = false;
+
+    void Awake() {
+        _renderer = GetComponentInChildren<Renderer>();
+        _hexAgent = GetComponent<HexAgent>();
+
+        var idleState = new ShipStateIdle(this);
+        var activeState = new ShipStateActive(this);
+        var movingState = new ShipStateMoving(this);
+
+        var idleToActiveTransition = new ShipTransition(activeState, () => IsActive);
+        var activeToMovingTransition = new ShipTransition(movingState, () => IsMoving);
+        var movingToIdleTransition = new ShipTransition(idleState, () => !IsMoving);
+
+        idleState.Transitions = new ShipTransition[] { idleToActiveTransition };
+        activeState.Transitions = new ShipTransition[] { activeToMovingTransition };
+        movingState.Transitions = new ShipTransition[] { movingToIdleTransition };
+
+        _stateMachina = new StateMachina(new IState[] { idleState, activeState, movingState }, idleState);
     }
 
+
     void Update() {
+        _stateMachina.Update();
+
         if (Input.GetMouseButtonDown(0)) {
             HandleInput();
         }
 
-        if (!_currentCell || !_nextCell) {
-            return;
+        if (IsActive) {
+            _renderer.material.color = activeColor;
         }
-
-        var progress = (Time.time - _timeStarted) / this._moveDuration;
-        if (progress >= 1) {
-            _currentCell = _nextCell;
-            transform.position = _currentCell.transform.position;
-
-            if (_currentIndex < _path.Count) {
-                S();
-            }
-            else {
-                CleanupPath();
-            }
-
+        else if (IsMoving) {
+            _renderer.material.color = movingColor;
         }
         else {
-            transform.position = Vector3.Lerp(
-                this._startPosition,
-                _nextCell.transform.position,
-                progress
-            );
-        }
-    }
-
-    void S() {
-        _nextCell = _path[_currentIndex++];
-        _timeStarted = Time.time;
-        _startPosition = transform.position;
-    }
-
-    void Spawn(HexCell at) {
-        enabled = true;
-        _currentCell = at;
-        _currentIndex = 0;
-
-        S();
-    }
-
-    void CleanupPath() {
-        _nextCell = null;
-        _path = new List<HexCell>();
-        foreach (var cell in hexGrid.Cells) {
-            cell.IsInPath = false;
+            _renderer.material.color = inactiveColor;
         }
     }
 
@@ -76,31 +55,12 @@ public class Ship : MonoBehaviour {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         int hits = Physics.RaycastNonAlloc(ray, _raycastHits);
 
-
-
         for (int i = 0; i < hits; i++) {
             var cell = _raycastHits[i].collider.GetComponentInParent<HexCell>();
             if (cell) {
-                StartPath(cell);
+                _hexAgent.SetDestination(cell);
                 break;
             }
         }
-    }
-
-    void StartPath(HexCell cell) {
-        var path = new AStarSearch(_currentCell, cell);
-
-        foreach (var item in path.cameFrom.Values) {
-            if (item && !_path.Contains(item)) {
-                _path.Add(item);
-                item.IsInPath = true;
-            }
-        }
-        _path.Add(cell);
-        cell.IsInPath = true;
-        // HighlightInRange(cell, 3);
-        // cell.ToggleIsActive();
-        Spawn(cell);
-        // hexGrid.HighlightPath(currentCell, cell);
     }
 }

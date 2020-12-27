@@ -1,0 +1,85 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+public class HexAgent : MonoBehaviour {
+    [SerializeField] HexGrid hexGrid = default;
+    [SerializeField] float _moveDuration = 0.3f;
+    float _timeStarted;
+    Vector3 _startPosition;
+    List<HexCell> _path = new List<HexCell>();
+    HexCell _currentCell;
+    HexCell _nextCell;
+    int _currentIndex;
+
+    void Start() {
+        _currentCell = hexGrid.Cells[0];
+        transform.position = _currentCell.transform.position;
+    }
+
+    void Update() {
+        if (!_currentCell || !_nextCell) {
+            return;
+        }
+
+        ProcessMovementStep();
+    }
+
+    public void SetDestination(HexCell cell) {
+        var path = new AStarSearch(_currentCell, cell);
+
+        foreach (var item in path.cameFrom.Values) {
+            if (item && !_path.Contains(item)) {
+                _path.Add(item);
+                item.IsInPath = true;
+            }
+        }
+
+        _path.Add(cell);
+        cell.IsInPath = true;
+        // HighlightInRange(cell, 3);
+        // cell.ToggleIsActive();
+        _currentCell = cell;
+        _currentIndex = 0;
+
+        ContinueToNextCell();
+        // hexGrid.HighlightPath(currentCell, cell);
+    }
+
+    void ContinueToNextCell() {
+        _nextCell = _path[_currentIndex++];
+        _timeStarted = Time.time;
+        _startPosition = transform.position;
+    }
+
+    void ProcessMovementStep() {
+        var progress = (Time.time - _timeStarted) / this._moveDuration;
+        if (progress >= 1) {
+            _currentCell = _nextCell;
+            transform.position = _currentCell.transform.position;
+
+            if (_currentIndex < _path.Count) {
+                ContinueToNextCell();
+            }
+            else {
+                CleanupPath();
+            }
+
+        }
+        else {
+            transform.position = Vector3.Lerp(
+                this._startPosition,
+                _nextCell.transform.position,
+                progress
+            );
+        }
+    }
+
+    void CleanupPath() {
+        _nextCell = null;
+        _path = new List<HexCell>();
+
+        foreach (var cell in hexGrid.Cells) {
+            cell.IsInPath = false;
+        }
+    }
+}
