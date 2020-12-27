@@ -4,6 +4,7 @@
 public class Ship : MonoBehaviour {
     public bool IsActive, IsMoving = false;
     public HexAgent HexAgent { get; private set; }
+    public Fleet Fleet { get; private set; }
 
     [SerializeField] Color inactiveColor = Color.white;
     [SerializeField] Color activeColor = Color.green;
@@ -43,5 +44,12 @@ public class Ship : MonoBehaviour {
         else {
             _renderer.material.color = inactiveColor;
         }
+    }
+
+    public Ship Spawn(Fleet fleet, HexCell hexCell) {
+        Fleet = fleet;
+        HexAgent.Spawn(hexCell);
+
+        return this;
     }
 }

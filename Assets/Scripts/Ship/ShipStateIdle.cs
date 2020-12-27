@@ -4,9 +4,8 @@ public class ShipStateIdle : ShipState {
 
     public ShipStateIdle(Ship ship) : base(ship) { }
 
-    public override void OnUpdate() {
-        if (Input.GetKeyDown(KeyCode.A)) {
-            _ship.IsActive = true;
-        }
+
+    public override void OnEnter() {
+        _ship.Fleet.ActivateNext();
     }
 }

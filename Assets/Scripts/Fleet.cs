@@ -5,9 +5,11 @@ public class Fleet : MonoBehaviour {
     [SerializeField] Vector2Int[] _positions = default;
 
     Ship[] _ships;
+    int _currentActive;
 
     public void SpawnOnGrid(HexGrid hexGrid) {
         _ships = new Ship[_positions.Length];
+        _currentActive = 0;
 
         for (int i = 0; i < _positions.Length; i++) {
             var cell = hexGrid.FindBy(_positions[i]);
@@ -17,8 +19,17 @@ public class Fleet : MonoBehaviour {
                 return;
             }
 
-            _ships[i] = Instantiate(_shipPrefab);
-            _ships[i].HexAgent.Spawn(cell);
+            _ships[i] = Instantiate(_shipPrefab).Spawn(this, cell);
         }
+
+        ActivateNext();
+    }
+
+    public void ActivateNext() {
+        if (_currentActive == _ships.Length) {
+            _currentActive = 0;
+        }
+
+        _ships[_currentActive++].IsActive = true;
     }
 }
