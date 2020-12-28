@@ -36,27 +36,39 @@ public class HexAgent : MonoBehaviour {
     }
 
     public void SetDestination(HexCell cell) {
-        var path = new AStarSearch(_currentCell, cell);
+        // preserve path
+        _path = new AStarSearch(_currentCell, cell)
+            .Search()
+            .Reconstruct();
 
-        foreach (var item in path.cameFrom.Values) {
-            if (item && !_path.Contains(item)) {
-                _path.Add(item);
-                item.Type = HexCellHighlightType.Path;
-            }
+        // highlight path
+        for (int i = 0; i < _path.Count; i++) {
+            _path[i].Type = HexCellHighlightType.Path;
         }
-
-        _path.Add(cell);
-        cell.Type = HexCellHighlightType.Path;
     }
 
     public void StartMoving(OnComplete onComplete) {
         _currentIndex = 0;
         _onComplete = onComplete;
+
         ContinueToNextCell();
     }
 
     public void HighlightMovementRange() {
-        _hexGrid.SetTypeInRange(_currentCell, _moveRange, HexCellHighlightType.Range);
+        // first find all cells that can be in ranage (excluding obsticles)
+        var cells = _hexGrid.FindAllInRange(_currentCell.coordinates, _moveRange);
+
+        for (int i = 0; i < cells.Length; i++) {
+            // now build path to each one of them
+            var path = new AStarSearch(_currentCell, cells[i])
+                .Search()
+                .Reconstruct();
+
+            // and calculate how many "steps" it will actually take to get to them
+            if (path.Count <= _moveRange) {
+                cells[i].Type = HexCellHighlightType.Range;
+            }
+        }
     }
 
     public void HideMovementRange() {
@@ -69,7 +81,7 @@ public class HexAgent : MonoBehaviour {
 
         return cells[index];
     }
-    
+
     void ContinueToNextCell() {
         _nextCell = _path[_currentIndex++];
         _timeStarted = Time.time;

@@ -64,27 +64,35 @@ public class HexGrid : MonoBehaviour {
 
     public void SetTypeInRange(HexCell center, int range, HexCellHighlightType type) {
         var cells = FindAllInRange(center.coordinates, range);
-        for (int i = 0; i < cells.Count; i++) {
+        for (int i = 0; i < cells.Length; i++) {
             cells[i].Type = type;
         }
     }
 
-    public void ResetTypeForAll() {
-        foreach (var cell in Cells) {
-            cell.Type = HexCellHighlightType.Default;
-        }
-    }
-
-    public void HighlightPath(HexCell from, HexCell to, HexCellHighlightType type) {
-        var path = new AStarSearch(to, from);
-        from.Type = HexCellHighlightType.Default;
-
-        foreach (var item in path.cameFrom) {
-            if (item.Value) {
-                item.Value.Type = type;
+    public HexCell[] FindAllInRange(HexCoordinates center, int range) =>
+        Array.FindAll(Cells, (cell) => {
+            if (cell.coordinates == center) {
+                return false;
             }
-        }
-    }
+
+            if (cell.Type == HexCellHighlightType.Occupied) {
+                return false;
+            }
+
+            if (Math.Abs(cell.coordinates.X - center.X) > range) {
+                return false;
+            }
+
+            if (Math.Abs(cell.coordinates.Y - center.Y) > range) {
+                return false;
+            }
+
+            if (Math.Abs(cell.coordinates.Z - center.Z) > range) {
+                return false;
+            }
+
+            return true;
+        });
 
     void SetNeighbors() {
         for (int i = 0; i < Cells.Length; i++) {
@@ -122,35 +130,6 @@ public class HexGrid : MonoBehaviour {
         label.text = cell.coordinates.ToString();
 
         return cell;
-    }
-
-    List<HexCell> FindAllInRange(HexCoordinates center, int range) {
-        var result = new List<HexCell>();
-        foreach (HexCell cell in Cells) {
-            if (cell.coordinates == center) {
-                continue;
-            }
-
-            if (cell.Type == HexCellHighlightType.Occupied) {
-                continue;
-            }
-
-            if (Math.Abs(cell.coordinates.X - center.X) > range) {
-                continue;
-            }
-
-            if (Math.Abs(cell.coordinates.Y - center.Y) > range) {
-                continue;
-            }
-
-            if (Math.Abs(cell.coordinates.Z - center.Z) > range) {
-                continue;
-            }
-
-            result.Add(cell);
-        }
-
-        return result;
     }
 
 }
