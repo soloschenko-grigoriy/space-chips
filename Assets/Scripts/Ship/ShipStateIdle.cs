@@ -6,6 +6,6 @@ public class ShipStateIdle : ShipState {
 
 
     public override void OnEnter() {
-        _ship.Fleet.ActivateNext();
+        _ship.Fleet.ActivateNextShip();
     }
 }

@@ -1,13 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 public class Level : MonoBehaviour {
     [SerializeField] HexGrid _hexGridPrefab = default;
-    [SerializeField] Fleet[] _fleetPrefabs = default;
+    [SerializeField] Fleet _playerFleetPrefab = default;
+    [SerializeField] Fleet _enemyFleetPrefab = default;
 
     HexGrid _hexGrid;
-    Fleet[] _fleets;
 
     void Awake() {
         // Instantiate Fleets only after grid is ready
@@ -16,12 +15,12 @@ public class Level : MonoBehaviour {
     }
 
     void SpawnFleet() {
-        _fleets = new Fleet[_fleetPrefabs.Length];
+        var playerFleet = Instantiate(_playerFleetPrefab);
+        var enemyFleet = Instantiate(_enemyFleetPrefab);
 
-        for (int i = 0; i < _fleetPrefabs.Length; i++) {
-            _fleets[i] = Instantiate(_fleetPrefabs[i]);
-            _fleets[i].SpawnOnGrid(_hexGrid);
-        }
+        playerFleet.SpawnOnGrid(_hexGrid, enemyFleet);
+        enemyFleet.SpawnOnGrid(_hexGrid, playerFleet);
+
+        playerFleet.IsActive = true;
     }
-
 }

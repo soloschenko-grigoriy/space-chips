@@ -19,7 +19,7 @@ public class ShipStateActive : ShipState {
     }
 
     public override void OnUpdate() {
-        switch (_ship.Fleet.Type) {
+        switch (_ship.Fleet.Owner) {
             case FleetOwner.Player: WaitForInput(); break;
             case FleetOwner.AI: WaitForAutoMove(); break;
         }

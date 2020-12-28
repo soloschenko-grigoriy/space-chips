@@ -1,4 +1,4 @@
-public class StateMachina {
+public abstract class StateMachina {
     public IState[] States;
 
     IState _currentState;

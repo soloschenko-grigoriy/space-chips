@@ -1,5 +1,5 @@
 public interface IState {
-    ITransition[] Transitions { get; }
+    StateTransition[] Transitions { get; }
 
     void OnEnter();
     void OnUpdate();

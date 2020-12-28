@@ -1,10 +1,10 @@
-public abstract class ShipState : IState {
+public abstract class FleetState : IState {
     public StateTransition[] Transitions { get; set; }
 
-    protected Ship _ship;
+    protected Fleet _fleet;
 
-    public ShipState(Ship ship) {
-        _ship = ship;
+    public FleetState(Fleet fleet) {
+        _fleet = fleet;
     }
 
     public virtual void OnEnter() { }

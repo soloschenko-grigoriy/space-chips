@@ -245,9 +245,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hexGridPrefab: {fileID: 6261198020720636159, guid: 49fea89162e9d4a86a83d088c6f9fbfa, type: 3}
-  _fleetPrefabs:
-  - {fileID: 7060745302883161858, guid: a4fb930ee57104a7bbcf2ee2a4aa5522, type: 3}
-  - {fileID: 7644306937962141835, guid: 9fe72510ae5454292b375dda237f8633, type: 3}
+  _playerFleetPrefab: {fileID: 7060745302883161858, guid: a4fb930ee57104a7bbcf2ee2a4aa5522, type: 3}
+  _enemyFleetPrefab: {fileID: 7644306937962141835, guid: 9fe72510ae5454292b375dda237f8633, type: 3}
 --- !u!4 &1253240659
 Transform:
   m_ObjectHideFlags: 0

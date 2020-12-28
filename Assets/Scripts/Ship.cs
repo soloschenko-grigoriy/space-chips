@@ -10,7 +10,7 @@ public class Ship : MonoBehaviour {
     [SerializeField] Color _activeColor = Color.green;
     [SerializeField] Color _movingColor = Color.red;
 
-    StateMachina _stateMachina;
+    ShipStateMachina _stateMachina;
     Renderer _renderer;
 
     void Awake() {
@@ -21,15 +21,15 @@ public class Ship : MonoBehaviour {
         var activeState = new ShipStateActive(this);
         var movingState = new ShipStateMoving(this);
 
-        var idleToActiveTransition = new ShipTransition(activeState, () => IsActive);
-        var activeToMovingTransition = new ShipTransition(movingState, () => IsMoving);
-        var movingToIdleTransition = new ShipTransition(idleState, () => !IsMoving);
+        var idleToActiveTransition = new ShipStateTransition(activeState, () => IsActive);
+        var activeToMovingTransition = new ShipStateTransition(movingState, () => IsMoving);
+        var movingToIdleTransition = new ShipStateTransition(idleState, () => !IsMoving);
 
-        idleState.Transitions = new ShipTransition[] { idleToActiveTransition };
-        activeState.Transitions = new ShipTransition[] { activeToMovingTransition };
-        movingState.Transitions = new ShipTransition[] { movingToIdleTransition };
+        idleState.Transitions = new ShipStateTransition[] { idleToActiveTransition };
+        activeState.Transitions = new ShipStateTransition[] { activeToMovingTransition };
+        movingState.Transitions = new ShipStateTransition[] { movingToIdleTransition };
 
-        _stateMachina = new StateMachina(new IState[] { idleState, activeState, movingState }, idleState);
+        _stateMachina = new ShipStateMachina(new ShipState[] { idleState, activeState, movingState }, idleState);
     }
 
     void Update() {
