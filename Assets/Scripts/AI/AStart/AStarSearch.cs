@@ -8,7 +8,7 @@ public class AStarSearch {
     public HexCell Start { get; private set; }
     public HexCell End { get; private set; }
 
-    static int Heuristic(HexCoordinates a, HexCoordinates b) => ((Mathf.Abs(a.X - b.X) + Mathf.Abs(a.Y - b.Y) + Mathf.Abs(a.Z - b.Z))) / 2;
+    static int Heuristic(HexCoordinates a, HexCoordinates b) => HexCoordinates.DistanceBetween(a, b);
 
     public AStarSearch(HexCell start, HexCell end) {
         Start = start;
@@ -53,7 +53,7 @@ public class AStarSearch {
             }
 
             foreach (var next in current.Neighbors) {
-                if (!next || next.Type == HexCellType.OccupiedByAlly || next.Type == HexCellType.OccupiedByEnemy) {
+                if (!next || next.OccupiedBy != null) {
                     continue;
                 }
 

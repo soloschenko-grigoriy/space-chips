@@ -3,22 +3,24 @@ using UnityEngine.UI;
 
 public class HUD : MonoBehaviour {
     public delegate void SkipClick();
-    public delegate void MeleeAttackClick();
     public static event SkipClick OnSkipClick;
-    public static event MeleeAttackClick OnMeleeAttackClick;
+    public delegate void MeleeAttackSelected(bool value);
 
-    [SerializeField] Button _meleeAttackButton = default;
+    public static event MeleeAttackSelected OnMeleeAttackSelected;
+
+    [SerializeField] Toggle _meleeAttackToggle = default;
 
     void Awake() {
         DeactivateMeleeAttackButton();
     }
 
     public void ActivateMeleeAttackButton() {
-        _meleeAttackButton.interactable = true;
+        _meleeAttackToggle.interactable = true;
     }
 
     public void DeactivateMeleeAttackButton() {
-        _meleeAttackButton.interactable = false;
+        _meleeAttackToggle.interactable = false;
+        _meleeAttackToggle.isOn = false;
     }
 
     public void Skip() {
@@ -27,9 +29,15 @@ public class HUD : MonoBehaviour {
         }
     }
 
-    public void MeleeAttack() {
-        if (OnMeleeAttackClick != null) {
-            OnMeleeAttackClick();
+    public void MeleeToggleChangedValue() {
+        if (!_meleeAttackToggle.interactable) {
+            return;
         }
+
+        if (OnMeleeAttackSelected == null) {
+            return;
+        }
+
+        OnMeleeAttackSelected(_meleeAttackToggle.isOn);
     }
 }

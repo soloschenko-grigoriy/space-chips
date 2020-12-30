@@ -62,25 +62,13 @@ public class HexGrid : MonoBehaviour {
         return FindBy(HexCoordinates.FromVector2(coordinates));
     }
 
-    public void SetTypeInRange(HexCell center, int range, HexCellType type) {
-        var cells = FindAllEmptyInRange(center.Coordinates, range);
-        for (int i = 0; i < cells.Length; i++) {
-            cells[i].Type = type;
-        }
-    }
-
     public HexCell[] FindAllOccupiedByEnemyInRange(HexCoordinates center, int range) =>
         Array.FindAll(Cells, (cell) => {
-            if (cell.Type != HexCellType.OccupiedByEnemy) {
+            if (cell.OccupiedBy == null) {
                 return false;
             }
 
-            return ChecOnekInRange(cell.Coordinates, center, range);
-        });
-
-    public HexCell[] FindAllOccupiedByAllyInRange(HexCoordinates center, int range) =>
-        Array.FindAll(Cells, (cell) => {
-            if (cell.Type != HexCellType.OccupiedByAlly) {
+            if (cell.OccupiedBy.Fleet.Owner == FleetOwner.Player) {
                 return false;
             }
 
@@ -89,11 +77,7 @@ public class HexGrid : MonoBehaviour {
 
     public HexCell[] FindAllEmptyInRange(HexCoordinates center, int range) =>
         Array.FindAll(Cells, (cell) => {
-            if (cell.Type == HexCellType.OccupiedByAlly) {
-                return false;
-            }
-
-            if (cell.Type == HexCellType.OccupiedByEnemy) {
+            if (cell.OccupiedBy != null) {
                 return false;
             }
 

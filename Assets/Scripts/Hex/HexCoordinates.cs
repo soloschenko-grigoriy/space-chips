@@ -38,4 +38,8 @@ public struct HexCoordinates {
     public static bool operator !=(HexCoordinates lhs, HexCoordinates rhs) {
         return !lhs.Equals(rhs);
     }
+
+    public static int DistanceBetween(HexCoordinates a, HexCoordinates b) {
+        return ((Mathf.Abs(a.X - b.X) + Mathf.Abs(a.Y - b.Y) + Mathf.Abs(a.Z - b.Z))) / 2;
+    }
 }

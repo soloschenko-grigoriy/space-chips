@@ -6,11 +6,13 @@ public class HexAgent : MonoBehaviour {
     public delegate void OnComplete(HexCell cell);
     public HexCell CurrentCell => _currentCell;
     public HexGrid HexGrid => _hexGrid;
+    public int MoveRange => _moveRange;
 
     [SerializeField] float _moveDuration = 0.3f;
     [SerializeField] int _moveRange = 2;
 
     HexGrid _hexGrid;
+    Ship _ship;
     float _timeStarted;
     Vector3 _startPosition;
     List<HexCell> _path = new List<HexCell>();
@@ -22,6 +24,7 @@ public class HexAgent : MonoBehaviour {
 
     void Awake() {
         _hexGrid = FindObjectOfType<HexGrid>();
+        _ship = GetComponent<Ship>();
     }
 
     void Update() {
@@ -32,10 +35,10 @@ public class HexAgent : MonoBehaviour {
         ProcessMovementStep();
     }
 
-    public void Spawn(HexCell cell, FleetOwner fleetOwner)  {
+    public void Spawn(HexCell cell, FleetOwner fleetOwner) {
         _fleetOwner = fleetOwner;
         _currentCell = cell;
-        cell.Type = fleetOwner == FleetOwner.Player ? HexCellType.OccupiedByAlly : HexCellType.OccupiedByEnemy;
+        cell.Occupy(_ship);
         transform.position = _currentCell.transform.position;
     }
 
@@ -76,7 +79,12 @@ public class HexAgent : MonoBehaviour {
     }
 
     public void HideMovementRange() {
-        _hexGrid.SetTypeInRange(_currentCell, _moveRange, HexCellType.Default);
+        var cells = _hexGrid.FindAllEmptyInRange(_currentCell.Coordinates, _moveRange);
+        for (int i = 0; i < cells.Length; i++) {
+            if (cells[i].Type == HexCellType.Range) {
+                cells[i].Type = HexCellType.Default;
+            }
+        }
     }
 
     public HexCell GetRandomCellInRange() {
@@ -93,11 +101,11 @@ public class HexAgent : MonoBehaviour {
     }
 
     void ProcessMovementStep() {
-        var progress = (Time.time - _timeStarted) / this._moveDuration;
+        var progress = (Time.time - _timeStarted) / _moveDuration;
         if (progress >= 1) {
-            _currentCell.Type = HexCellType.Default;
+            _currentCell.Liberate();
             _currentCell = _nextCell;
-            _currentCell.Type = _fleetOwner == FleetOwner.Player ? HexCellType.OccupiedByAlly : HexCellType.OccupiedByEnemy;
+            _currentCell.Occupy(_ship);
 
             transform.position = _currentCell.transform.position;
 
