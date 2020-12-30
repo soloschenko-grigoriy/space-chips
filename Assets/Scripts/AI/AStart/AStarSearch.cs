@@ -48,19 +48,19 @@ public class AStarSearch {
         while (frontier.Count > 0) {
             var current = frontier.Dequeue();
 
-            if (current.coordinates.Equals(End.coordinates)) {
+            if (current.Coordinates.Equals(End.Coordinates)) {
                 break;
             }
 
             foreach (var next in current.Neighbors) {
-                if (!next || next.Type == HexCellHighlightType.Occupied) {
+                if (!next || next.Type == HexCellType.OccupiedByAlly || next.Type == HexCellType.OccupiedByEnemy) {
                     continue;
                 }
 
                 int newCost = CostSoFar[current] + current.Cost(next);
                 if (!CostSoFar.ContainsKey(next) || newCost < CostSoFar[next]) {
                     CostSoFar[next] = newCost;
-                    int priority = newCost + Heuristic(next.coordinates, End.coordinates);
+                    int priority = newCost + Heuristic(next.Coordinates, End.Coordinates);
                     frontier.Enqueue(next, priority);
                     CameFrom[next] = current;
                 }

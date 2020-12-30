@@ -1,16 +1,16 @@
 ﻿using UnityEngine;
 
-public enum HexCellHighlightType {
-    Target, Range, Path, Occupied, Default
+public enum HexCellType {
+    Target, Range, Path, OccupiedByAlly, OccupiedByEnemy, Default
 }
 
 public class HexCell : MonoBehaviour {
     public static float Width = 1.73f;
     public static float Height = 2f;
 
-    public HexCoordinates coordinates;
+    public HexCoordinates Coordinates;
     public HexCell[] Neighbors;
-    public HexCellHighlightType Type = HexCellHighlightType.Default;
+    public HexCellType Type = HexCellType.Default;
 
     [SerializeField] Color _defaultColor = Color.white;
     [SerializeField] Color _activeColor = Color.green;
@@ -35,10 +35,11 @@ public class HexCell : MonoBehaviour {
     void SetColor() {
         var color = _renderer.material.color = _defaultColor;
         switch (Type) {
-            case HexCellHighlightType.Path: color = _pathColor; break;
-            case HexCellHighlightType.Range: color = _rangeColor; break;
-            case HexCellHighlightType.Target: color = _activeColor; break;
-            case HexCellHighlightType.Occupied: color = _occupiedColor; break;
+            case HexCellType.Path: color = _pathColor; break;
+            case HexCellType.Range: color = _rangeColor; break;
+            case HexCellType.Target: color = _activeColor; break;
+            case HexCellType.OccupiedByAlly: color = _occupiedColor; break;
+            case HexCellType.OccupiedByEnemy: color = _occupiedColor; break;
         }
 
         if (color != _renderer.material.color) {

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class HexAgent : MonoBehaviour {
     public delegate void OnComplete(HexCell cell);
+    public HexCell CurrentCell => _currentCell;
+    public HexGrid HexGrid => _hexGrid;
 
     [SerializeField] float _moveDuration = 0.3f;
     [SerializeField] int _moveRange = 2;
@@ -16,6 +18,7 @@ public class HexAgent : MonoBehaviour {
     HexCell _nextCell;
     int _currentIndex;
     OnComplete _onComplete;
+    FleetOwner _fleetOwner;
 
     void Awake() {
         _hexGrid = FindObjectOfType<HexGrid>();
@@ -29,9 +32,10 @@ public class HexAgent : MonoBehaviour {
         ProcessMovementStep();
     }
 
-    public void Spawn(HexCell cell) {
+    public void Spawn(HexCell cell, FleetOwner fleetOwner)  {
+        _fleetOwner = fleetOwner;
         _currentCell = cell;
-        cell.Type = HexCellHighlightType.Occupied;
+        cell.Type = fleetOwner == FleetOwner.Player ? HexCellType.OccupiedByAlly : HexCellType.OccupiedByEnemy;
         transform.position = _currentCell.transform.position;
     }
 
@@ -43,7 +47,7 @@ public class HexAgent : MonoBehaviour {
 
         // highlight path
         for (int i = 0; i < _path.Count; i++) {
-            _path[i].Type = HexCellHighlightType.Path;
+            _path[i].Type = HexCellType.Path;
         }
     }
 
@@ -56,7 +60,7 @@ public class HexAgent : MonoBehaviour {
 
     public void HighlightMovementRange() {
         // first find all cells that can be in ranage (excluding obsticles)
-        var cells = _hexGrid.FindAllInRange(_currentCell.coordinates, _moveRange);
+        var cells = _hexGrid.FindAllEmptyInRange(_currentCell.Coordinates, _moveRange);
 
         for (int i = 0; i < cells.Length; i++) {
             // now build path to each one of them
@@ -66,17 +70,17 @@ public class HexAgent : MonoBehaviour {
 
             // and calculate how many "steps" it will actually take to get to them
             if (path.Count <= _moveRange) {
-                cells[i].Type = HexCellHighlightType.Range;
+                cells[i].Type = HexCellType.Range;
             }
         }
     }
 
     public void HideMovementRange() {
-        _hexGrid.SetTypeInRange(_currentCell, _moveRange, HexCellHighlightType.Default);
+        _hexGrid.SetTypeInRange(_currentCell, _moveRange, HexCellType.Default);
     }
 
     public HexCell GetRandomCellInRange() {
-        var cells = Array.FindAll(_hexGrid.Cells, (c) => c.Type == HexCellHighlightType.Range);
+        var cells = Array.FindAll(_hexGrid.Cells, (c) => c.Type == HexCellType.Range);
         var index = UnityEngine.Random.Range(0, cells.Length - 1);
 
         return cells[index];
@@ -91,9 +95,9 @@ public class HexAgent : MonoBehaviour {
     void ProcessMovementStep() {
         var progress = (Time.time - _timeStarted) / this._moveDuration;
         if (progress >= 1) {
-            _currentCell.Type = HexCellHighlightType.Default;
+            _currentCell.Type = HexCellType.Default;
             _currentCell = _nextCell;
-            _currentCell.Type = HexCellHighlightType.Occupied;
+            _currentCell.Type = _fleetOwner == FleetOwner.Player ? HexCellType.OccupiedByAlly : HexCellType.OccupiedByEnemy;
 
             transform.position = _currentCell.transform.position;
 

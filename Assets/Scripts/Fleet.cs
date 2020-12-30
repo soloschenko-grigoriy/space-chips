@@ -60,6 +60,6 @@ public class Fleet : MonoBehaviour {
             return;
         }
 
-        _ships[_currentActive++].IsActive = true;
+        _ships[_currentActive++].Activate();
     }
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-public class ShipStateActive : ShipState {
-    public ShipStateActive(Ship ship) : base(ship) { }
+public class ShipStateAwait : ShipState {
+    public ShipStateAwait(Ship ship) : base(ship) { }
     RaycastHit[] _raycastHits = new RaycastHit[100];
 
     float timeToMakeAutoMove;
@@ -9,13 +9,20 @@ public class ShipStateActive : ShipState {
     bool autoMoveInProgress = false;
 
     public override void OnEnter() {
-        timeToMakeAutoMove = Time.time + autoMoveDelay;
-        autoMoveInProgress = false;
-        _ship.HexAgent.HighlightMovementRange();
-    }
+        HUD.OnSkipClick += _ship.SkipTurn;
+        HUD.OnMeleeAttackClick += _ship.SelectAction;
 
-    public override void OnExit() {
-        _ship.IsActive = false;
+        if (_ship.CanMove) {
+            timeToMakeAutoMove = Time.time + autoMoveDelay;
+            autoMoveInProgress = false;
+            _ship.HexAgent.HighlightMovementRange();
+        }
+        else if (_ship.Fleet.Owner == FleetOwner.AI) {
+            _ship.SkipTurn();
+            return;
+        } else if(_ship.Fleet.Owner == FleetOwner.Player){
+            _ship.CheckEnemiesInMeleeRange();
+        }
     }
 
     public override void OnUpdate() {
@@ -25,6 +32,12 @@ public class ShipStateActive : ShipState {
         }
     }
 
+    public override void OnExit() {
+        HUD.OnSkipClick -= _ship.SkipTurn;
+        HUD.OnMeleeAttackClick -= _ship.SelectAction;
+        _ship.HexAgent.HideMovementRange();
+    }
+
     void WaitForInput() {
         if (Input.GetMouseButtonDown(0)) {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -32,8 +45,8 @@ public class ShipStateActive : ShipState {
 
             for (int i = 0; i < hits; i++) {
                 var cell = _raycastHits[i].collider.GetComponentInParent<HexCell>();
-                if (cell && cell.Type == HexCellHighlightType.Range) {
-                    SetDestination(cell);
+                if (cell && cell.Type == HexCellType.Range) {
+                    _ship.StartMovingTo(cell);
                     break;
                 }
             }
@@ -49,13 +62,8 @@ public class ShipStateActive : ShipState {
             return;
         }
 
-        SetDestination(_ship.HexAgent.GetRandomCellInRange());
+        _ship.StartMovingTo(_ship.HexAgent.GetRandomCellInRange());
         autoMoveInProgress = true;
     }
 
-    void SetDestination(HexCell cell) {
-        _ship.HexAgent.HideMovementRange();
-        _ship.HexAgent.SetDestination(cell);
-        _ship.IsMoving = true;
-    }
 }

@@ -36,15 +36,15 @@ public class HexGrid : MonoBehaviour {
 
     public HexCell FindBy(int x, int y, int z) {
         for (int i = 0; i < Cells.Length; i++) {
-            if (Cells[i].coordinates.X != x) {
+            if (Cells[i].Coordinates.X != x) {
                 continue;
             }
 
-            if (Cells[i].coordinates.Y != y) {
+            if (Cells[i].Coordinates.Y != y) {
                 continue;
             }
 
-            if (Cells[i].coordinates.Z != z) {
+            if (Cells[i].Coordinates.Z != z) {
                 continue;
             }
 
@@ -62,36 +62,42 @@ public class HexGrid : MonoBehaviour {
         return FindBy(HexCoordinates.FromVector2(coordinates));
     }
 
-    public void SetTypeInRange(HexCell center, int range, HexCellHighlightType type) {
-        var cells = FindAllInRange(center.coordinates, range);
+    public void SetTypeInRange(HexCell center, int range, HexCellType type) {
+        var cells = FindAllEmptyInRange(center.Coordinates, range);
         for (int i = 0; i < cells.Length; i++) {
             cells[i].Type = type;
         }
     }
 
-    public HexCell[] FindAllInRange(HexCoordinates center, int range) =>
+    public HexCell[] FindAllOccupiedByEnemyInRange(HexCoordinates center, int range) =>
         Array.FindAll(Cells, (cell) => {
-            if (cell.coordinates == center) {
+            if (cell.Type != HexCellType.OccupiedByEnemy) {
                 return false;
             }
 
-            if (cell.Type == HexCellHighlightType.Occupied) {
+            return ChecOnekInRange(cell.Coordinates, center, range);
+        });
+
+    public HexCell[] FindAllOccupiedByAllyInRange(HexCoordinates center, int range) =>
+        Array.FindAll(Cells, (cell) => {
+            if (cell.Type != HexCellType.OccupiedByAlly) {
                 return false;
             }
 
-            if (Math.Abs(cell.coordinates.X - center.X) > range) {
+            return ChecOnekInRange(cell.Coordinates, center, range);
+        });
+
+    public HexCell[] FindAllEmptyInRange(HexCoordinates center, int range) =>
+        Array.FindAll(Cells, (cell) => {
+            if (cell.Type == HexCellType.OccupiedByAlly) {
                 return false;
             }
 
-            if (Math.Abs(cell.coordinates.Y - center.Y) > range) {
+            if (cell.Type == HexCellType.OccupiedByEnemy) {
                 return false;
             }
 
-            if (Math.Abs(cell.coordinates.Z - center.Z) > range) {
-                return false;
-            }
-
-            return true;
+            return ChecOnekInRange(cell.Coordinates, center, range);
         });
 
     void SetNeighbors() {
@@ -99,17 +105,17 @@ public class HexGrid : MonoBehaviour {
             var cell = Cells[i];
             cell.Neighbors = new HexCell[6];
             // NE
-            cell.Neighbors[0] = FindBy(cell.coordinates.X, cell.coordinates.Y - 1, cell.coordinates.Z + 1);
+            cell.Neighbors[0] = FindBy(cell.Coordinates.X, cell.Coordinates.Y - 1, cell.Coordinates.Z + 1);
             // E 
-            cell.Neighbors[1] = FindBy(cell.coordinates.X + 1, cell.coordinates.Y - 1, cell.coordinates.Z);
+            cell.Neighbors[1] = FindBy(cell.Coordinates.X + 1, cell.Coordinates.Y - 1, cell.Coordinates.Z);
             // SE 
-            cell.Neighbors[2] = FindBy(cell.coordinates.X + 1, cell.coordinates.Y, cell.coordinates.Z - 1);
+            cell.Neighbors[2] = FindBy(cell.Coordinates.X + 1, cell.Coordinates.Y, cell.Coordinates.Z - 1);
             // SW 
-            cell.Neighbors[3] = FindBy(cell.coordinates.X, cell.coordinates.Y + 1, cell.coordinates.Z - 1);
+            cell.Neighbors[3] = FindBy(cell.Coordinates.X, cell.Coordinates.Y + 1, cell.Coordinates.Z - 1);
             // W 
-            cell.Neighbors[4] = FindBy(cell.coordinates.X - 1, cell.coordinates.Y + 1, cell.coordinates.Z);
+            cell.Neighbors[4] = FindBy(cell.Coordinates.X - 1, cell.Coordinates.Y + 1, cell.Coordinates.Z);
             // NW
-            cell.Neighbors[5] = FindBy(cell.coordinates.X - 1, cell.coordinates.Y, cell.coordinates.Z + 1);
+            cell.Neighbors[5] = FindBy(cell.Coordinates.X - 1, cell.Coordinates.Y, cell.Coordinates.Z + 1);
         }
     }
 
@@ -122,14 +128,33 @@ public class HexGrid : MonoBehaviour {
         var cell = Instantiate<HexCell>(hexCellPrefab);
         cell.transform.SetParent(transform, false);
         cell.transform.position = position;
-        cell.coordinates = HexCoordinates.FromOffsetCoordinates(col, row);
+        cell.Coordinates = HexCoordinates.FromOffsetCoordinates(col, row);
 
         var label = Instantiate<Text>(cellLabelPrefab);
         label.rectTransform.SetParent(canvas.transform, false);
         label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
-        label.text = cell.coordinates.ToString();
+        label.text = cell.Coordinates.ToString();
 
         return cell;
     }
 
+    bool ChecOnekInRange(HexCoordinates cell, HexCoordinates center, int range) {
+        if (cell == center) {
+            return false;
+        }
+
+        if (Math.Abs(cell.X - center.X) > range) {
+            return false;
+        }
+
+        if (Math.Abs(cell.Y - center.Y) > range) {
+            return false;
+        }
+
+        if (Math.Abs(cell.Z - center.Z) > range) {
+            return false;
+        }
+
+        return true;
+    }
 }
