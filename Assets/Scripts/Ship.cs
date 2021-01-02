@@ -8,6 +8,7 @@ public class Ship : MonoBehaviour {
     public HexAgent HexAgent => _hexAgent;
     public Fleet Fleet => _fleet;
 
+    [SerializeField] int _rangeAttackRange = 7;
     [SerializeField] Color _idleColor = Color.white;
     [SerializeField] Color _awaitColor = Color.green;
     [SerializeField] Color _moveColor = Color.yellow;
@@ -21,10 +22,10 @@ public class Ship : MonoBehaviour {
     Fleet _fleet;
     HUD _hud;
     bool _isAwaiting, _isMoving, _canMove = false;
-    Ship[] _targets;
+    Ship[] _meleeTargets;
+    Ship[] _rangeTargets;
     Ship _currentTarget;
-
-    RaycastHit[] _raycastHits = new RaycastHit[100];
+    AttackType _attackType;
 
     void Awake() {
         _renderer = GetComponentInChildren<Renderer>();
@@ -42,7 +43,7 @@ public class Ship : MonoBehaviour {
 
         awaitState.Transitions = new ShipStateTransition[] {
             new ShipStateTransition(moveState, () => _isMoving),
-            new ShipStateTransition(actState, () => !_isMoving && _currentTarget != null), // <------
+            new ShipStateTransition(actState, () => !_isMoving && _currentTarget != null),
             new ShipStateTransition(idleState, () => !_isAwaiting)
         };
 
@@ -89,27 +90,50 @@ public class Ship : MonoBehaviour {
         return this;
     }
 
-    public void CheckForEnemiesInRange(int range) {
-        var cells = HexAgent.HexGrid.FindAllOccupiedByEnemyInRange(HexAgent.CurrentCell.Coordinates, range);
-        _targets = new Ship[cells.Length];
+    public void CheckForEnemies() {
+        var meleeCells = HexAgent.HexGrid.FindAllOccupiedByEnemyInRange(HexAgent.CurrentCell.Coordinates, CanMove ? HexAgent.MoveRange + 1 : 1);
+        var rangeCells = HexAgent.HexGrid.FindAllOccupiedByEnemyInRange(HexAgent.CurrentCell.Coordinates, _rangeAttackRange);
 
-        for (var i = 0; i < cells.Length; i++) {
-            _targets[i] = cells[i].OccupiedBy;
-        }
-
-        if (cells.Length > 0) {
+        if (meleeCells.Length > 0) {
             _hud.ActivateMeleeAttackButton();
         }
         else {
             _hud.DeactivateMeleeAttackButton();
         }
+
+        if (rangeCells.Length > 0) {
+            _hud.ActivateRangeAttackButton();
+        }
+        else {
+            _hud.DeactivateRangeAttackButton();
+        }
+
+        _meleeTargets = new Ship[meleeCells.Length];
+        _rangeTargets = new Ship[rangeCells.Length];
+        for (var i = 0; i < meleeCells.Length; i++) {
+            _meleeTargets[i] = meleeCells[i].OccupiedBy;
+        }
+
+        for (var i = 0; i < rangeCells.Length; i++) {
+            _rangeTargets[i] = rangeCells[i].OccupiedBy;
+
+        }
     }
 
     public void ClearTargets() {
         _hud.DeactivateMeleeAttackButton();
+        _hud.DeactivateRangeAttackButton();
 
-        for (var i = 0; i < _targets.Length; i++) {
-            _targets[i].CanBeTargeted = false;
+        if (_meleeTargets != null) {
+            for (var i = 0; i < _meleeTargets.Length; i++) {
+                _meleeTargets[i].CanBeTargeted = false;
+            }
+        }
+
+        if (_rangeTargets != null) {
+            for (var i = 0; i < _rangeTargets.Length; i++) {
+                _rangeTargets[i].CanBeTargeted = false;
+            }
         }
     }
 
@@ -128,9 +152,10 @@ public class Ship : MonoBehaviour {
         _isMoving = false;
     }
 
-    public void OnMeleeAttackSelected(bool value) {
-        for (var i = 0; i < _targets.Length; i++) {
-            _targets[i].CanBeTargeted = value;
+    public void OnAttackSelected(AttackType type, bool value) {
+        switch (type) {
+            case AttackType.Melee: OnMeleeAttackSelected(value); break;
+            case AttackType.Range: OnRangeAttackSelected(value); break;
         }
     }
 
@@ -138,11 +163,13 @@ public class Ship : MonoBehaviour {
         _currentTarget = target;
         target.IsTarget = true;
 
+        if (_attackType != AttackType.Melee) {
+            return;
+        }
+
         // if Ship needs to move to target and actually can do so
         if (CanMove && HexAgent.CurrentCell.DistanceTo(target.HexAgent.CurrentCell) > 1) {
-            var cell = target.HexAgent.CurrentCell.FindClosestNeighbor(HexAgent.CurrentCell);
-
-            StartMovingTo(cell);
+            StartMovingTo(target.HexAgent.CurrentCell.FindClosestNeighbor(HexAgent.CurrentCell));
         }
     }
 
@@ -154,5 +181,30 @@ public class Ship : MonoBehaviour {
         _isAwaiting = false;
         _currentTarget.IsTarget = false;
         _currentTarget = null;
+    }
+
+    public void AllowSkip() {
+        _hud.ActivateSkipButton();
+    }
+
+    public void DisableSkip() {
+        _hud.DeactivateSkipButton();
+    }
+
+    void OnMeleeAttackSelected(bool value) {
+        _attackType = AttackType.Melee;
+        for (var i = 0; i < _meleeTargets.Length; i++) {
+            _meleeTargets[i].CanBeTargeted = value;
+        }
+    }
+
+    void OnRangeAttackSelected(bool value) {
+        _attackType = AttackType.Range;
+        for (var i = 0; i < _rangeTargets.Length; i++) {
+            if (_rangeTargets[i] != null) {
+                _rangeTargets[i].CanBeTargeted = value;
+            }
+
+        }
     }
 }

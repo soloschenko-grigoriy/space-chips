@@ -9,21 +9,23 @@ public class ShipStateAwait : ShipState {
     bool autoMoveInProgress = false;
 
     public override void OnEnter() {
+        Debug.Log("Enter AWAIT");
         HUD.OnSkipClick += _ship.SkipTurn;
-        HUD.OnMeleeAttackSelected += _ship.OnMeleeAttackSelected;
+        HUD.OnAttackSelected += _ship.OnAttackSelected;
+
+        if (_ship.Fleet.Owner == FleetOwner.Player) {
+            _ship.AllowSkip();
+            _ship.CheckForEnemies();
+        }
 
         if (_ship.CanMove) {
             timeToMakeAutoMove = Time.time + autoMoveDelay;
             autoMoveInProgress = false;
             _ship.HexAgent.HighlightMovementRange();
-            _ship.CheckForEnemiesInRange(_ship.HexAgent.MoveRange + 1);
         }
         else if (_ship.Fleet.Owner == FleetOwner.AI) {
             _ship.SkipTurn();
             return;
-        }
-        else if (_ship.Fleet.Owner == FleetOwner.Player) {
-            _ship.CheckForEnemiesInRange(1);
         }
     }
 
@@ -36,9 +38,10 @@ public class ShipStateAwait : ShipState {
 
     public override void OnExit() {
         HUD.OnSkipClick -= _ship.SkipTurn;
-        HUD.OnMeleeAttackSelected -= _ship.OnMeleeAttackSelected;
+        HUD.OnAttackSelected -= _ship.OnAttackSelected;
         _ship.HexAgent.HideMovementRange();
         _ship.ClearTargets();
+        _ship.DisableSkip();
     }
 
     void WaitForInput() {
@@ -47,7 +50,7 @@ public class ShipStateAwait : ShipState {
             int hits = Physics.RaycastNonAlloc(ray, _raycastHits);
 
             for (int i = 0; i < hits; i++) {
-                var ship = _raycastHits[i].collider.GetComponent<Ship>();
+                var ship = _raycastHits[i].collider.GetComponentInParent<Ship>();
                 if (ship && ship.CanBeTargeted) {
                     _ship.SetTarget(ship);
                     break;
