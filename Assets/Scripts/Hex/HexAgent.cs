@@ -130,6 +130,12 @@ public class HexAgent : MonoBehaviour {
 
     void CleanupPath() {
         _nextCell = null;
+
+        for (int i = 0; i < _path.Count; i++) {
+            if (_path[i].Type == HexCellType.Path) {
+                _path[i].Type = HexCellType.Default;
+            }
+        }
         _path = new List<HexCell>();
     }
 }

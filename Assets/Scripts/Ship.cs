@@ -2,7 +2,19 @@
 
 [RequireComponent(typeof(HexAgent))]
 public class Ship : MonoBehaviour {
-    public bool CanBeTargeted = false;
+    public bool CanBeTargeted {
+        get => _canBeTargeted;
+        set {
+            _canBeTargeted = value;
+
+            if (value) {
+                _warMachine.ShowStats();
+            }
+            else {
+                _warMachine.HideStats();
+            }
+        }
+    }
     public bool IsTarget = false;
     public bool CanMove => _canMove;
     public HexAgent HexAgent => _hexAgent;
@@ -21,15 +33,17 @@ public class Ship : MonoBehaviour {
     HexAgent _hexAgent;
     Fleet _fleet;
     HUD _hud;
-    bool _isAwaiting, _isMoving, _canMove = false;
+    bool _isAwaiting, _isMoving, _canMove, _canBeTargeted = false;
     Ship[] _meleeTargets;
     Ship[] _rangeTargets;
     Ship _currentTarget;
     AttackType _attackType;
+    WarMachine _warMachine;
 
     void Awake() {
         _renderer = GetComponentInChildren<Renderer>();
         _hexAgent = GetComponent<HexAgent>();
+        _warMachine = GetComponent<WarMachine>();
         _hud = FindObjectOfType<HUD>();
 
         var idleState = new ShipStateIdle(this);
@@ -140,6 +154,7 @@ public class Ship : MonoBehaviour {
     public void Activate() {
         _isAwaiting = true;
         _canMove = true;
+        _warMachine.ShowStats();
     }
 
     public void StartMovingTo(HexCell cell) {
@@ -175,12 +190,14 @@ public class Ship : MonoBehaviour {
 
     public void SkipTurn() {
         _isAwaiting = false;
+        _warMachine.HideStats();
     }
 
     public void OnActionDone() {
         _isAwaiting = false;
         _currentTarget.IsTarget = false;
         _currentTarget = null;
+        _warMachine.HideStats();
     }
 
     public void AllowSkip() {

@@ -18,7 +18,6 @@ public class HexCell : MonoBehaviour {
     [SerializeField] Color _rangeColor = Color.red;
     [SerializeField] Color _pathColor = Color.grey;
     [SerializeField] Color _occupiedColor = Color.clear;
-    [SerializeField] Color _closestNeighbor = Color.magenta;
 
     Renderer _renderer;
     Ship _occupiedBy;
