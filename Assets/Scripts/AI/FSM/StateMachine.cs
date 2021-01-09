@@ -1,5 +1,6 @@
 public abstract class StateMachina {
     public IState[] States;
+    public IState CurrentState => _currentState;
 
     IState _currentState;
 

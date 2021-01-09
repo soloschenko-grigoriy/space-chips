@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShipStateAwait : ShipState {
     public ShipStateAwait(Ship ship) : base(ship) { }
@@ -12,6 +13,8 @@ public class ShipStateAwait : ShipState {
         Debug.Log("Enter AWAIT");
         HUD.OnSkipClick += _ship.SkipTurn;
         HUD.OnAttackSelected += _ship.OnAttackSelected;
+        AttackMethodSelection.OnAttackMethodSelected += _ship.EstimateDamage;
+        AttackMethodSelection.OnAttackConfirmed += _ship.Execute;
 
         if (_ship.Fleet.Owner == FleetOwner.Player) {
             _ship.AllowSkip();
@@ -39,6 +42,8 @@ public class ShipStateAwait : ShipState {
     public override void OnExit() {
         HUD.OnSkipClick -= _ship.SkipTurn;
         HUD.OnAttackSelected -= _ship.OnAttackSelected;
+        AttackMethodSelection.OnAttackMethodSelected -= _ship.EstimateDamage;
+        AttackMethodSelection.OnAttackConfirmed -= _ship.Execute;
         _ship.HexAgent.HideMovementRange();
         _ship.ClearTargets();
         _ship.DisableSkip();

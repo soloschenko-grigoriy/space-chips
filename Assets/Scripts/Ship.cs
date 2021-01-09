@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(HexAgent))]
 public class Ship : MonoBehaviour {
@@ -10,15 +11,28 @@ public class Ship : MonoBehaviour {
             if (value) {
                 _warMachine.ShowStats();
             }
-            else {
+            else if (!IsTarget) {
                 _warMachine.HideStats();
             }
         }
     }
-    public bool IsTarget = false;
+    public bool IsTarget {
+        get => _isTarget;
+        set {
+            _isTarget = value;
+            if (value) {
+                _warMachine.ShowMethodSelection();
+            }
+            else {
+                _warMachine.HideStats();
+                _warMachine.HideMethodSelection();
+            }
+        }
+    }
     public bool CanMove => _canMove;
     public HexAgent HexAgent => _hexAgent;
     public Fleet Fleet => _fleet;
+    public WarMachine WarMachine => _warMachine;
 
     [SerializeField] int _rangeAttackRange = 7;
     [SerializeField] Color _idleColor = Color.white;
@@ -33,12 +47,13 @@ public class Ship : MonoBehaviour {
     HexAgent _hexAgent;
     Fleet _fleet;
     HUD _hud;
-    bool _isAwaiting, _isMoving, _canMove, _canBeTargeted = false;
+    bool _isAwaiting, _isMoving, _canMove, _canBeTargeted, _isTarget, _isActing = false;
     Ship[] _meleeTargets;
     Ship[] _rangeTargets;
     Ship _currentTarget;
     AttackType _attackType;
     WarMachine _warMachine;
+    AttackMethod _attackMethod;
 
     void Awake() {
         _renderer = GetComponentInChildren<Renderer>();
@@ -57,35 +72,34 @@ public class Ship : MonoBehaviour {
 
         awaitState.Transitions = new ShipStateTransition[] {
             new ShipStateTransition(moveState, () => _isMoving),
-            new ShipStateTransition(actState, () => !_isMoving && _currentTarget != null),
+            new ShipStateTransition(actState, () => _isActing),
             new ShipStateTransition(idleState, () => !_isAwaiting)
         };
 
         moveState.Transitions = new ShipStateTransition[] {
-            new ShipStateTransition(awaitState, () => !_isMoving && _currentTarget == null),
-            new ShipStateTransition(actState, () => !_isMoving && _currentTarget != null)
+            new ShipStateTransition(awaitState, () => !_isMoving && !_isActing),
+            new ShipStateTransition(actState, () => !_isMoving && _isActing)
         };
 
         actState.Transitions = new ShipStateTransition[] {
-            new ShipStateTransition(idleState, () => _currentTarget == null)
+            new ShipStateTransition(idleState, () => !_isActing)
         };
-
         _stateMachina = new ShipStateMachina(new ShipState[] { idleState, awaitState, moveState, actState }, idleState);
     }
 
     void Update() {
         _stateMachina.Update();
 
-        if (_isMoving) {
+        if (_stateMachina.CurrentState is ShipStateMove) {
             _renderer.material.color = _moveColor;
         }
-        else if (_currentTarget != null) {
+        else if (_stateMachina.CurrentState is ShipStateAct) {
             _renderer.material.color = _actColor;
         }
         else if (CanBeTargeted) {
             _renderer.material.color = _canBeTargetColor;
         }
-        else if (_isAwaiting) {
+        else if (_stateMachina.CurrentState is ShipStateAwait) {
             _renderer.material.color = _awaitColor;
         }
         else if (IsTarget) {
@@ -138,6 +152,11 @@ public class Ship : MonoBehaviour {
         _hud.DeactivateMeleeAttackButton();
         _hud.DeactivateRangeAttackButton();
 
+        if (_currentTarget != null) {
+            _currentTarget.WarMachine.ClearPreviewDamage();
+            _currentTarget.WarMachine.HideMethodSelection();
+        }
+
         if (_meleeTargets != null) {
             for (var i = 0; i < _meleeTargets.Length; i++) {
                 _meleeTargets[i].CanBeTargeted = false;
@@ -175,29 +194,50 @@ public class Ship : MonoBehaviour {
     }
 
     public void SetTarget(Ship target) {
+        if (_currentTarget != null) {
+            return;
+        }
+
         _currentTarget = target;
         target.IsTarget = true;
+    }
+
+    public void Execute() {
+        _isActing = true;
 
         if (_attackType != AttackType.Melee) {
             return;
         }
 
         // if Ship needs to move to target and actually can do so
-        if (CanMove && HexAgent.CurrentCell.DistanceTo(target.HexAgent.CurrentCell) > 1) {
-            StartMovingTo(target.HexAgent.CurrentCell.FindClosestNeighbor(HexAgent.CurrentCell));
+        if (CanMove && HexAgent.CurrentCell.DistanceTo(_currentTarget.HexAgent.CurrentCell) > 1) {
+            StartMovingTo(_currentTarget.HexAgent.CurrentCell.FindClosestNeighbor(HexAgent.CurrentCell));
         }
+
     }
 
     public void SkipTurn() {
         _isAwaiting = false;
         _warMachine.HideStats();
+        _warMachine.HideMethodSelection();
     }
 
     public void OnActionDone() {
-        _isAwaiting = false;
+        _currentTarget.WarMachine.TakeDamage(_attackMethod, _warMachine.Power);
+
+        StartCoroutine(Cleanup());
+    }
+
+    IEnumerator Cleanup() {
+        yield return new WaitForSeconds(0.5f);
         _currentTarget.IsTarget = false;
         _currentTarget = null;
+
         _warMachine.HideStats();
+
+        _isAwaiting = false;
+        _isActing = false;
+
     }
 
     public void AllowSkip() {
@@ -206,6 +246,11 @@ public class Ship : MonoBehaviour {
 
     public void DisableSkip() {
         _hud.DeactivateSkipButton();
+    }
+
+    public void EstimateDamage(AttackMethod method) {
+        _attackMethod = method;
+        _currentTarget.WarMachine.PreviewDamage(_attackMethod, _warMachine.Power);
     }
 
     void OnMeleeAttackSelected(bool value) {
