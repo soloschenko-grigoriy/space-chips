@@ -1,4 +1,5 @@
 # Ships Game
+v0.2.0
 
 ## Refs
 [Miro](https://miro.com/app/board/o9J_kog5lC0=/)
