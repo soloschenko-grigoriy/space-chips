@@ -143,6 +143,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rows: 12
-  cols: 8
+  cols: 12
   hexCellPrefab: {fileID: 4697639445127745332, guid: 623a4b13c9e3844ebaa39439b5412eb5, type: 3}
   cellLabelPrefab: {fileID: 1088738881307886183, guid: 08d7939e7e77a4f94b969f4b61f61661, type: 3}
