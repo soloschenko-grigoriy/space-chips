@@ -47,7 +47,7 @@ public class CameraManager : MonoBehaviour {
 
     void LateUpdate() {
         Move();
-        Rotate();
+        // Rotate();
         Zoom();
     }
 
