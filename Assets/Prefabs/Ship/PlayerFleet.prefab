@@ -45,6 +45,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _shipPrefab: {fileID: 5575717923744332507, guid: 246d671926a2c409c8345457544d0ffb, type: 3}
   _positions:
+  - {x: -4, y: -5}
   - {x: -2, y: -5}
-  - {x: 2, y: -6}
+  - {x: 0, y: -5}
+  - {x: 2, y: -5}
+  - {x: 4, y: -5}
   _type: 0
