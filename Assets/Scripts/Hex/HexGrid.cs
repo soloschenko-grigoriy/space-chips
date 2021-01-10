@@ -8,6 +8,10 @@ public class HexGrid : MonoBehaviour {
     public HexCell[] Cells { get; private set; }
     public bool IsReady { get; private set; } = false;
 
+    enum HexShapeType {
+        Hex, Rombus
+    }
+
     [SerializeField] int rows = 6;
     [SerializeField] int cols = 6;
     [SerializeField] HexCell hexCellPrefab = default;
@@ -17,13 +21,8 @@ public class HexGrid : MonoBehaviour {
 
     public void Generate(OnReady onReady) {
         canvas = GetComponentInChildren<Canvas>();
-        Cells = new HexCell[(cols + 1) * (rows + 1)];
-
-        for (int i = 0, col = -cols / 2; col < cols / 2 + 1; col++) {
-            for (int row = -rows / 2; row < rows / 2 + 1; row++, i++) {
-                Cells[i] = CreateCell(col, row);
-            }
-        }
+        GenerateAsHex();
+        // GenerateAsRombus();
 
         SetNeighbors();
 
@@ -32,6 +31,39 @@ public class HexGrid : MonoBehaviour {
 
         IsReady = true;
         onReady();
+    }
+    void GenerateAsHex() {
+        var m = rows - 1;
+        var cells = new List<HexCell>();
+
+        for (int i = 0, row = -m; row < rows; row++) {
+            var to = m;
+            var from = -m;
+            if (row < 0) {
+                from = -m - row;
+                to = m;
+            }
+            else if (row > 0) {
+                from = -m;
+                to = m - row;
+            }
+
+            for (int col = from; col <= to; col++, i++) {
+                cells.Add(CreateCell(col, row, HexShapeType.Hex));
+            }
+        }
+
+        Cells = cells.ToArray();
+    }
+
+    void GenerateAsRombus() {
+        Cells = new HexCell[(cols + 1) * (rows + 1)];
+
+        for (int i = 0, col = -cols / 2; col < cols / 2 + 1; col++) {
+            for (int row = -rows / 2; row < rows / 2 + 1; row++, i++) {
+                Cells[i] = CreateCell(col, row, HexShapeType.Rombus);
+            }
+        }
     }
 
     public HexCell FindBy(int x, int y, int z) {
@@ -103,21 +135,32 @@ public class HexGrid : MonoBehaviour {
         }
     }
 
-    HexCell CreateCell(int col, int row) {
+    HexCell CreateCell(int col, int row, HexShapeType type) {
         var position = new Vector3();
-        position.x = (col + row * 0.5f - row / 2) * HexCell.Width;
+        if (type == HexShapeType.Rombus) {
+            position.x = (col + row * 0.5f - row / 2) * HexCell.Width;
+        }
+        else {
+            position.x = (col + row * 0.5f) * HexCell.Width;
+        }
+
         position.y = 0f;
         position.z = row * HexCell.Height * 0.75f;
 
         var cell = Instantiate<HexCell>(hexCellPrefab);
         cell.transform.SetParent(transform, false);
         cell.transform.position = position;
-        cell.Coordinates = HexCoordinates.FromOffsetCoordinates(col, row);
+        if (type == HexShapeType.Rombus) {
+            cell.Coordinates = HexCoordinates.FromOffsetCoordinates(col, row);
+        }
+        else {
+            cell.Coordinates = new HexCoordinates(col, row);
+        }
 
         var label = Instantiate<Text>(cellLabelPrefab);
         label.rectTransform.SetParent(canvas.transform, false);
         label.rectTransform.anchoredPosition = new Vector2(position.x, position.z);
-        label.text = cell.Coordinates.ToString();
+        // label.text = cell.Coordinates.ToString();
 
         return cell;
     }

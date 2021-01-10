@@ -767,6 +767,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7125971451821981346, guid: 39cf0fc35b7854922be4696f76d52522, type: 3}
+      propertyPath: _rotateSpeed
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7125971451821981346, guid: 39cf0fc35b7854922be4696f76d52522, type: 3}
+      propertyPath: _minBounds.x
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7125971451821981346, guid: 39cf0fc35b7854922be4696f76d52522, type: 3}
+      propertyPath: _minBounds.y
+      value: -16
+      objectReference: {fileID: 0}
+    - target: {fileID: 7125971451821981346, guid: 39cf0fc35b7854922be4696f76d52522, type: 3}
+      propertyPath: _maxBounds.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7125971451821981346, guid: 39cf0fc35b7854922be4696f76d52522, type: 3}
+      propertyPath: _maxBounds.y
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 7125971451821981356, guid: 39cf0fc35b7854922be4696f76d52522, type: 3}
       propertyPath: m_Name
       value: Camera Focus
