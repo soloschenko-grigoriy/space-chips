@@ -49,12 +49,11 @@ MonoBehaviour:
     z: 0
   Neighbors: []
   Type: 4
-  _defaultColor: {r: 0.24705882, g: 0.6, b: 0.8235294, a: 0.3529412}
+  _defaultColor: {r: 0.003693494, g: 0.48222667, b: 0.7830189, a: 0.12156863}
   _activeColor: {r: 0, g: 1, b: 0, a: 0.3529412}
-  _rangeColor: {r: 0.7294118, g: 0.11764706, b: 0.40784314, a: 0.3529412}
-  _pathColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.3529412}
-  _occupiedColor: {r: 0, g: 0, b: 0, a: 0.3529412}
-  _closestNeighbor: {r: 1, g: 0, b: 1, a: 0.3529412}
+  _rangeColor: {r: 0.003921569, g: 0.48235294, b: 0.78431374, a: 0.25490198}
+  _pathColor: {r: 0.003921569, g: 0.48235294, b: 0.78431374, a: 0.12156863}
+  _occupiedColor: {r: 0.003921569, g: 0.48235294, b: 0.78431374, a: 0.12156863}
 --- !u!1 &8394056523169401676
 GameObject:
   m_ObjectHideFlags: 0
